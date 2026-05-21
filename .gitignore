@@ -20,3 +20,4 @@ docs/doctrees/*
 .idea_C/
 tcc_python_scripts.egg-info/
 dist/
+venv

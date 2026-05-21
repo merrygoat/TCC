@@ -1,15 +1,11 @@
 """Python interface to the TCC executable."""
 
 import os
-import tempfile
 import shutil
 import numpy
-import pandas
-import subprocess
-import platform
-from glob import glob
 
-from tcc_python_scripts.tcc import structures, wrapper
+from tcc_python_scripts.tcc import wrapper
+
 
 class DynamicCluster:
     def __init__(self, particles, time):
@@ -43,6 +39,7 @@ class DynamicCluster:
 
     def __repr__(self):
         return '<DynamicCluster t0={} t1={}>'.format(self.creation_time, self.last_seen_time)
+
 
 class DynamicTCC(wrapper.TCCWrapper):
     def save(self, destination):

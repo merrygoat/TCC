@@ -63,7 +63,7 @@ class DynamoSnapshot(snapshot.Snapshot):
             self.diameters[start:end+1] = diameter
 
         elif range_type == 'Pair':
-            range0, range1 = uij_range.getchildren()
+            range0, range1 = list(uij_range)
             start0, start1 = [int(r.attrib['Start']) for r in [range0, range1]]
             end0, end1 = [int(r.attrib['End']) for r in [range0, range1]]
 
@@ -99,7 +99,7 @@ class DynamoSnapshot(snapshot.Snapshot):
         if uij_range.attrib['Type'] != 'Pair':
             return
 
-        range0, range1 = uij_range.getchildren()
+        range0, range1 = list(uij_range)
         start0, start1 = [int(r.attrib['Start']) for r in [range0, range1]]
         end0, end1 = [int(r.attrib['End']) for r in [range0, range1]]
 
@@ -144,7 +144,7 @@ class DynamoSnapshot(snapshot.Snapshot):
 
             # Particle coordinates
             self.particle_coordinates = numpy.array([list(p.find('P').attrib.values()) for p in self.xml['particles']], dtype=numpy.longdouble)
-            if self.num_particles != len(self.xml['particles'].getchildren()):
+            if self.num_particles != len(list(self.xml['particles'])):
                 raise RuntimeError('inconsistent file!')
 
             # Particle species
@@ -161,7 +161,7 @@ class DynamoSnapshot(snapshot.Snapshot):
             self.box = self.xml['simulation'].find('SimulationSize')
             box_lengths = numpy.array([float(self.box.attrib[dim]) for dim in ['x', 'y', 'z']])
             self.box = numpy.array([[0., length] for length in box_lengths])
-            self.volume = numpy.product(box_lengths)
+            self.volume = numpy.prod(box_lengths)
             self.density = self.num_particles / self.volume
 
             # Find the diameters of the particles, assuming additive interactions.
