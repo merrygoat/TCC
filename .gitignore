@@ -21,3 +21,4 @@ docs/doctrees/*
 tcc_python_scripts.egg-info/
 dist/
 venv
+/tcc_python/example/result/

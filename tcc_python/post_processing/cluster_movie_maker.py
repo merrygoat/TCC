@@ -182,8 +182,7 @@ class RawFileReader:
         self.cluster_name = cluster_type
 
     def get_frame(self):
-        """
-        Get a single frame of data from the raw file.
+        """Get a single frame of data from the raw file.
 
         Returns:
             list of string: Whether the particles are in a cluster or not.
@@ -206,9 +205,7 @@ class Snapshot:
     and coordinates.
     """
     def __init__(self):
-        """
-        Initialise variables.
-        """
+        """Initialise variables."""
         self.num_particles = 0
         self.comment = ""
         self.particle_species = []
@@ -217,7 +214,7 @@ class Snapshot:
         self.z_coordinates = []
 
     def __str__(self):
-        """"
+        """
         Returns:
             string: String representation of the Snapshot.
         """
@@ -230,9 +227,7 @@ class Snapshot:
         return buffer.getvalue()
 
     def write_xyz(self, output_name):
-        """
-        Write the Snapshot to an xyz file.
-        """
+        """Write the Snapshot to an xyz file."""
         with open(output_name, 'a') as output_file:
             output_file.write("{}\n".format(self.num_particles))
             output_file.write("{}".format(self.comment))

@@ -3,7 +3,7 @@
 import io
 import numpy
 import pandas
-from tcc_python_scripts.file_readers.snapshot import stream_safe_open, NoSnapshotError, Snapshot
+from tcc_python.file_readers.snapshot import stream_safe_open, NoSnapshotError, Snapshot
 
 
 class AtomSnapshot(Snapshot):

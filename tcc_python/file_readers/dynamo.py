@@ -1,7 +1,7 @@
 """ Module for reading and writing snapshots from and to DynamO (.xml) file formats."""
 
 import numpy
-import tcc_python_scripts.file_readers.snapshot as snapshot
+import tcc_python.file_readers.snapshot as snapshot
 import xml.etree.ElementTree as ElementTree
 
 

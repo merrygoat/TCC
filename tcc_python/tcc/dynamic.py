@@ -4,7 +4,7 @@ import os
 import shutil
 import numpy
 
-from tcc_python_scripts.tcc import wrapper
+from tcc_python.tcc import wrapper
 
 
 class DynamicCluster:

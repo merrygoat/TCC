@@ -1,5 +1,5 @@
 [project]
-name = "tcc_python_scripts"
+name = "tcc_python"
 version = "1.0"
 description = "A series of scripts for automating the TCC and postprocessing its output"
 requires-python = ">=3.9"

@@ -4,7 +4,7 @@ import io
 import re
 import numpy
 import pandas
-from tcc_python_scripts.file_readers.snapshot import stream_safe_open, NoSnapshotError, SnapshotIncompleteError, Snapshot
+from tcc_python.file_readers.snapshot import stream_safe_open, NoSnapshotError, SnapshotIncompleteError, Snapshot
 
 
 class XYZSnapshot(Snapshot):
@@ -16,7 +16,7 @@ class XYZSnapshot(Snapshot):
     def _read(self, path_or_file):
         """ Read a single XYZ snapshot from a file.
 
-        Overwrites any exisiting data in the Snaphsot object.
+        Overwrites any existing data in the Snapshot object.
 
         Raises:
             NoSnapshotError if file could not be read.

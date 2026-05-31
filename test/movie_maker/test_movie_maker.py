@@ -1,6 +1,6 @@
 import filecmp
 import os
-from tcc_python_scripts.post_processing import cluster_movie_maker
+from tcc_python.post_processing import cluster_movie_maker
 
 
 class cd:
