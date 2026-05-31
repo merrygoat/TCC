@@ -18,5 +18,7 @@ tools/net_clusters/*.xyz
 .DS_Store
 docs/doctrees/*
 .idea_C/
-tcc_python_scripts.egg-info/
+tcc_python.egg-info/
 dist/
+venv
+/tcc_python/example/result/
