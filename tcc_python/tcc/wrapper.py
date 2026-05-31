@@ -1,17 +1,20 @@
 """Python interface to the TCC executable."""
 
 import os
+import pathlib
 import re
 import tempfile
 import shutil
+from typing import Optional
+
 import numpy
 import pandas
 import subprocess
 import platform
 from glob import glob
 
-from tcc_python_scripts.file_readers import xyz
-from tcc_python_scripts.tcc import structures
+from tcc_python.file_readers import xyz
+from tcc_python.tcc import structures
 
 
 class TCCWrapper:
@@ -32,15 +35,15 @@ class TCCWrapper:
         working_directory: The directory in which the TCC will run
         tcc_executable_directory: The directory containing the TCC executable
         tcc_executable_path: The full path of the TCC executable
-        input_parameters['Box']: TCC box paramaters used for TCC run
-        input_parameters['Run']: TCC run paramaters used for TCC run
-        input_parameters['Simulation']: TCC simulation paramaters used for TCC run
-        input_parameters['Output']: TCC output paramaters used for TCC run
+        input_parameters['Box']: TCC box parameters used for TCC run
+        input_parameters['Run']: TCC run parameters used for TCC run
+        input_parameters['Simulation']: TCC simulation parameters used for TCC run
+        input_parameters['Output']: TCC output parameters used for TCC run
         input_parameters['Clusters_to_analyse']: List of clusters to include in the analysis, all are detected if list is empty
     """
 
-    def __init__(self, clusters_to_analyse=None):
-        """On initialisation we have to create a temporary directory
+    def __init__(self, tcc_executable_directory: Optional[os.PathLike[str]] = None, clusters_to_analyse=None):
+        """On initialisation, we have to create a temporary directory
         where file operations will be performed behind the scenes.
 
         Args:
@@ -57,13 +60,13 @@ class TCCWrapper:
         self.input_parameters['Run'] = dict()
         self.input_parameters['Simulation'] = dict()
         self.input_parameters['Output'] = dict()
+        self.cleanup = True
 
         self.clusters_to_analyse = clusters_to_analyse
         self.input_parameters['Simulation']['analyse_all_clusters'] = not clusters_to_analyse
 
     def __del__(self):
-        """Upon deletion we can remove the temporary working folder
-        to free up disk space."""
+        """Upon deletion the temporary working folder can be removed to free up disk space."""
         if self.cleanup:
             shutil.rmtree(self.working_directory)
 
@@ -93,7 +96,8 @@ class TCCWrapper:
                 else:
                     shutil.copy2(full_path, destination)
 
-    def run(self, box, particle_coordinates, output_directory=None, output_clusters=False, particle_types='A', silent=True):
+    def run(self, box, particle_coordinates, output_directory=None, output_clusters=False, particle_types='A',
+            silent=True):
         """Invoke the TCC using the provided coordinates and parameters.
 
         Args:
@@ -122,26 +126,20 @@ class TCCWrapper:
         # Create the INI file.
         n_frame = self.input_parameters['Run'].get('frames')
         if not n_frame:
-            self.input_parameters['Run']['frames'] = xyz.get_frame_number(
-                particle_coordinates
-            )
-        self._serialise_input_parameters(
-            '{}/inputparameters.ini'.format(self.working_directory)
-        )
+            self.input_parameters['Run']['frames'] = xyz.get_frame_number(particle_coordinates)
+        self._serialise_input_parameters('{}/inputparameters.ini'.format(self.working_directory))
 
         # Create the box and configuration files.
         self._write_box_file(box, self.working_directory)
-        xyz.write_multiple(
-            '{}/sample.xyz'.format(self.working_directory),
-            particle_coordinates, species=particle_types
-        )
+        xyz.write_multiple('{}/sample.xyz'.format(self.working_directory), particle_coordinates, species=particle_types)
 
         if self.clusters_to_analyse:
             self._write_clusters_to_analyse(self.clusters_to_analyse, self.working_directory)
 
         # Run the TCC executable.
         if silent:
-            subprocess_result = subprocess.run(self.tcc_executable_path, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, cwd=self.working_directory)
+            subprocess_result = subprocess.run(self.tcc_executable_path, stdout=subprocess.DEVNULL,
+                                               stderr=subprocess.DEVNULL, cwd=self.working_directory)
         else:
             subprocess_result = subprocess.run(self.tcc_executable_path, cwd=self.working_directory)
 
@@ -186,7 +184,8 @@ class TCCWrapper:
         Returns:
             If provided executable path is valid, returns full path, else raises FileNotFoundError.
         """
-        if self.tcc_executable_path is not None and os.path.exists(self.tcc_executable_path): return
+        if self.tcc_executable_path is not None and os.path.exists(self.tcc_executable_path):
+            return
 
         bin_directory = os.path.abspath(self.tcc_executable_directory)
         if platform.system() == "Windows":
@@ -222,7 +221,7 @@ class TCCWrapper:
 
     @staticmethod
     def _write_box_file(box, folder_path):
-        """Serialise the box box size in the TCC format.
+        """Serialise the box size in the TCC format.
 
         Args:
             box: Box dimensions are given as a list of the format [len_x, len_y, len_z].
@@ -284,19 +283,21 @@ class TCCWrapper:
             numpy.warnings.simplefilter("ignore")
             clusters = numpy.loadtxt(cluster_path, skiprows=1, dtype=int)
 
-        if len(clusters) == 0: return []
-        if len(clusters.shape) == 1: clusters = clusters.reshape(1,-1)
+        if len(clusters) == 0:
+            return []
+        if len(clusters.shape) == 1:
+            clusters = clusters.reshape(1,-1)
 
         return clusters
 
-    def _parse_particle_clusters(self, natoms):
+    def _parse_particle_clusters(self, num_atoms):
         """Determine whether each particle belongs to a certain cluster or not
         Returns:
             Numpy array (bool) saying whether each particle (row) belong to each cluster (column)."""
-        nclusters = len(self.active_clusters)
-        table = numpy.zeros((natoms, nclusters), dtype=bool)
+        num_clusters = len(self.active_clusters)
+        table = numpy.zeros((num_atoms, num_clusters), dtype=bool)
 
-        for i,structure in enumerate(self.active_clusters):
+        for i, structure in enumerate(self.active_clusters):
             found_clusters = self._parse_cluster_file(structure)
             table[found_clusters.reshape(-1), i] = True
 
@@ -305,8 +306,10 @@ class TCCWrapper:
     @property
     def active_clusters(self):
         """Returns: list of clusters active in the analysis."""
-        if self.clusters_to_analyse: return self.clusters_to_analyse
-        else: return structures.cluster_list
+        if self.clusters_to_analyse:
+            return self.clusters_to_analyse
+        else:
+            return structures.cluster_list
 
     def get_cluster_dict(self, cluster_names=None):
         """
@@ -474,11 +477,18 @@ class TCCWrapper:
         # convert the dictionary to a list of table
         result = []
         for f in range(frame_num):
-            data = { key : frame[f].flatten() for key, frame in cluster_dict.items() }
-            result.append(
-                pandas.DataFrame.from_dict(
-                    data=data,
-                    orient='columns'
-                )
-            )
+            data = {key: frame[f].flatten() for key, frame in cluster_dict.items()}
+            result.append(pandas.DataFrame.from_dict(data=data, orient='columns'))
         return result
+
+    def get_cluster_summary(self) -> dict[str, dict]:
+        """Reads the cluster summary from the .static clust file, returning results as a nested dictionary."""
+        cluster_dict = {}
+        cluster_summary = list(pathlib.Path(self.working_directory).glob("*.static_clust"))[0]
+        with open(cluster_summary) as input_file:
+            data = input_file.readlines()
+            for line in data[2:]:
+                line = line.strip().split("\t")
+                cluster_dict[line[0]] = {"num_clusters": int(line[1]), "gross_particles": int(line[2]),
+                                         "mean_pop_per_frame": float(line[3])}
+        return cluster_dict

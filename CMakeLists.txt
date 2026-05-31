@@ -8,6 +8,6 @@ IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
-
+add_compile_options(-fcommon)
 add_subdirectory(extern/iniparser/src)
 add_subdirectory(src)
