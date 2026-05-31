@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int box_type;                    //if the system in non-cubic or NPT, get box size info from a datafile
-int frames_to_analyse;           // frames to read from input xmol file
-int num_cluster_types;           // The number of items in the cluster names array
+extern int box_type;                    //if the system in non-cubic or NPT, get box size info from a datafile
+extern int frames_to_analyse;           // frames to read from input xmol file
+extern int num_cluster_types;           // The number of items in the cluster names array
 
 extern int cluster_size[];        // A list of the number of particles in each cluster type
 extern char* cluster_names[];     // A list of strings of cluster names
@@ -26,141 +26,160 @@ struct xyz_info {
     long *frame_offsets;
 };
 
-char *fXmolName, *fBoxSizeName; //Name of xyz file, name of file which contains info on box
-long box_offsets[1000];          // Offsets of each line in the box file
-double *x, *y, *z;              // positions in x y and z directions of N particles
-int *particle_type;             // species of particle, index is particle number
+extern char *fXmolName, *fBoxSizeName; //Name of xyz file, name of file which contains info on box
+extern long box_offsets[1000];          // Offsets of each line in the box file
+extern double *x, *y, *z;              // positions in x y and z directions of N particles
+extern int *particle_type;             // species of particle, index is particle number
 
-double rcutAA,rcutAA2,rcutAB,rcutAB2,rcutBB,rcutBB2;    // diameters of AB and BB interactions for binary interactions
-double min_cutAA, min_cutAA2;
-double fc;                  // Voronoi adjustment parameter
-int use_voronoi_bonds;      // 0 use simple bond length method build_bond_network(), 1 use Voronoi method Get_Bonds_With_Voronoi()
-int PBCs;                   // 0 do not impliment periodic boundary conditions, 1 implement periodic boundary conditions
-int max_num_bonds;          // max number of bonds per particle
-int use_cell_list;          // 0  do not use cell list, 1 use cell list
-int analyse_all_clusters;   // 0 Read clusters to analyse from file, 1 analyse all clusters
+extern double rcutAA,rcutAA2,rcutAB,rcutAB2,rcutBB,rcutBB2;    // diameters of AB and BB interactions for binary interactions
+extern double min_cutAA, min_cutAA2;
+extern double fc;                  // Voronoi adjustment parameter
+extern int use_voronoi_bonds;      // 0 use simple bond length method build_bond_network(), 1 use Voronoi method Get_Bonds_With_Voronoi()
+extern int PBCs;                   // 0 do not impliment periodic boundary conditions, 1 implement periodic boundary conditions
+extern int max_num_bonds;          // max number of bonds per particle
+extern int use_cell_list;          // 0  do not use cell list, 1 use cell list
+extern int analyse_all_clusters;   // 0 Read clusters to analyse from file, 1 analyse all clusters
 
-int doWriteBonds;   // write bonds files out
-int doWriteClus;    // write out indices of each detected cluster
-int doWriteRaw; // write raw_*** cluster xmol files out
-int do11AcenXyz; // write centres of 11A
-int do13AcenXyz; // write centres of 13A
-int eleven_A_number; // The location of the 11A cluster in the cluster list
-int thirteen_A_number;
-int doWritePopPerFrame; // write pop_per_frame file
-int doWriteXYZ; // Write clusters as XYZ file
+extern int doWriteBonds;           // write bonds files out
+extern int doWriteClus;            // write out indices of each detected cluster
+extern int doWriteRaw;             // write raw_*** cluster xmol files out
+extern int do11AcenXyz;            // write centres of 11A
+extern int do13AcenXyz;            // write centres of 13A
+extern int eleven_A_number;        // The location of the 11A cluster in the cluster list
+extern int thirteen_A_number;
+extern int doWritePopPerFrame;     // write pop_per_frame file
+extern int doWriteXYZ;             // Write clusters as XYZ file
 
-int incrStatic; // when full, increment cluster arrays by this amount
+extern int incrStatic;             // when full, increment cluster arrays by this amount
 
 // Lists of particle population of each cluster type in each frame, index i is the frame number,
 // index j is the cluster type
-double **pop_per_frame;
+extern double **pop_per_frame;
 
 // The average population of each cluster type over all frames, index i is cluster type
-double *mean_pop_per_frame;
+extern double *mean_pop_per_frame;
 
 // Gross number of particles in the specified cluster type accumulated over all frames
-int *num_gross_particles;
+extern int *num_gross_particles;
 
 // Total number of clusters of the specified type accumulated over all frames
-int *total_clusters;
+extern int *total_clusters;
 
 // Per frame variables
 
 // Box and bond variables
+extern double sidex, sidey, sidez, half_sidex, half_sidey, half_sidez;
+extern double tiltxy,tiltxz,tiltyz;
+extern long particles_in_current_frame;
 
-double sidex, sidey, sidez, half_sidex, half_sidey, half_sidez;
-double tiltxy,tiltxz,tiltyz;
-long particles_in_current_frame;
+extern int *num_bonds;                                       // Current Number of Bonds for particles {1,...,N}
+extern int **bond_list;                                      // list of particles (indices j) bonded to particle at index i
+extern double **squared_bondlengths;                         // length of bonds in the bond network and squared
+extern int maxnb;                                            // max number of bonds to one particle
+extern int correctedBonds;                                   // bonds adjusted due to voronoi assymetry
 
-int *num_bonds;                                       // Current Number of Bonds for particles {1,...,N}
-int **bond_list;                                      // list of particles (indices j) bonded to particle at index i
-double **squared_bondlengths;                         // length of bonds in the bond network and squared
-int maxnb;                                            // max number of bonds to one particle
-int correctedBonds;                                   // bonds adjusted due to voronoi assymetry
+extern int num_sort_columns;                                 // Number of columns to iterate over with quicksort
 
-int num_sort_columns;                                 // Number of columns to iterate over with quicksort
-
-int n_cells_x, n_cells_y, n_cells_z, n_cells_total;   // number of cells per box length, total number of cells
-int *head;                                            // head of cell array
-int *linked_list;                                     // linked list array
-double cell_len_x, cell_len_y, cell_len_z;
+extern int n_cells_x, n_cells_y, n_cells_z, n_cells_total;   // number of cells per box length, total number of cells
+extern int *head;                                            // head of cell array
+extern int *linked_list;                                     // linked list array
+extern double cell_len_x, cell_len_y, cell_len_z;
 
 // Cluster variables
 
-// Whether to perform analysis of this type of cluster
-int dosp3, dosp3a, dosp3b, dosp3c;
-int dosp4, dosp4a, dosp4b, dosp4c;
-int dosp5, dosp5a, dosp5b, dosp5c;
-int do6A, do6Z, do7K, do7T_a, do7T_s;
-int do8A, do8B, do8K;
-int do9A, do9B, do9K;
-int do10A, do10B, do10K, do10W;
-int do11A, do11B, do11C, do11E, do11F, do11W;
-int do12A, do12B, do12D, do12E, do12K;
-int do13A, do13B, do13K;
-int doFCC, doHCP, doBCC9;
+// whether to perform analysis of this type of cluster
+extern int dosp3,   dosp3a,  dosp3b,   dosp3c;
+extern int dosp4,   dosp4a,  dosp4b,   dosp4c;
+extern int dosp5,   dosp5a,  dosp5b,   dosp5c;                                                     // 12 here but spN not in others so count 9
+extern int do6A,    do6MW,   do6Z;                                                                 // 12
+extern int do7K,    do7MW,   do7PAB,   do7T_a, do7T_s;                                             // 17
+extern int do8A,    do8B,    do8K,     do8MW,  do8O,   do8PAA,  do8PAB,  do8PBB;                   // 25
+extern int do9A,    do9B,    do9K,     do9MW,  do9PAA, do9PAB,  do9PBB,  do9S;                     // 33
+extern int do10A,   do10B,   do10K,    do10MW, do10O,  do10PAA, do10PAB, do10PBB, do10S,   do10W;  // 43
+extern int do11A,   do11B,   do11C,    do11E,  do11F,  do11MW,  do11O,   do11PAA, do11PAB;         // 52
+extern int do11PBB, do11S,   do11SB,   do11W;                                                      // 56
+extern int do12A,   do12B,   do12D,    do12E,  do12K,  do12MW,  do12O;                             // 63
+extern int do12PAA, do12PAB, do12PBB,  do12S,  do12SB;                                             // 68
+extern int do13A,   do13B,   do13K,    do13MW;                                                     // 72
+extern int do13PAA, do13PAB, do13PBB,  do13S,  do13SB;                                             // 77
+extern int do14O,   doFCC,   doHCP,    doBCC9;                                                     // 81
 
 // number of clusters of particlar type in current frame
-int nsp3a, nsp3b, nsp3c;
-int nsp4a, nsp4b, nsp4c;
-int nsp5a, nsp5b, nsp5c;
-int n6A, n6Z, n7K, n7T_a, n7T_s;
-int n8A, n8B, n8K;
-int n9A, n9B, n9K;
-int n10A, n10B, n10K, n10W;
-int n11A, n11B, n11C, n11E, n11F, n11W;
-int n12A, n12B, n12D, n12E, n12K;
-int n13A, n13B, n13K;
-int nFCC, nHCP, nBCC_9;
+extern int nsp3a,  nsp3b,  nsp3c;
+extern int nsp4a,  nsp4b,  nsp4c;
+extern int nsp5a,  nsp5b,  nsp5c;                                                       // 9
+extern int n6A,    n6MW,   n6Z;                                                         // 12
+extern int n7K,    n7MW,   n7PAB,  n7T_a, n7T_s;                                        // 17
+extern int n8A,    n8B,    n8K,    n8MW,  n8O,   n8PAA,  n8PAB,  n8PBB;                 // 25
+extern int n9A,    n9B,    n9K,    n9MW,  n9PAA, n9PAB,  n9PBB,  n9S;                   // 33
+extern int n10A,   n10B,   n10K,   n10MW, n10O,  n10PAA, n10PAB, n10PBB, n10S, n10W;    // 43
+extern int n11A,   n11B,   n11C,   n11E,  n11F,  n11MW,  n11O,   n11PAA, n11PAB;        // 52
+extern int n11PBB, n11S,   n11SB,  n11W;                                                // 56
+extern int n12A,   n12B,   n12D,   n12E,  n12K,  n12MW,  n12O;                          // 63
+extern int n12PAA, n12PAB, n12PBB, n12S,  n12SB;                                        // 68
+extern int n13A,   n13B,   n13K,   n13MW;                                               // 72
+extern int n13PAA, n13PAB, n13PBB, n13S,  n13SB;                                        // 77
+extern int n14O, nFCC,   nHCP,   nBCC_9;                                                // 81
 
 // max size of cluster storage arrays in dimension i
-int msp3a, msp3b, msp3c;
-int msp4a, msp4b, msp4c;
-int msp5a, msp5b, msp5c;
-int m6A, m6Z, m7K, m7T_a, m7T_s;
-int m8A, m8B, m8K;
-int m9A, m9B, m9K;
-int m10A, m10B, m10K, m10W;
-int m11A, m11B, m11C, m11E, m11F, m11W;
-int m12A, m12B, m12D, m12E, m12K;
-int m13A, m13B, m13K;
-int mFCC, mHCP, mBCC_9;
+extern int msp3a,  msp3b,  msp3c;
+extern int msp4a,  msp4b,  msp4c;
+extern int msp5a,  msp5b,  msp5c;                                                       // 9
+extern int m6A,    m6MW,   m6Z;                                                         // 12
+extern int m7K,    m7MW,   m7PAB,  m7T_a, m7T_s;                                        // 17
+extern int m8A,    m8B,    m8K,    m8MW,  m8O,   m8PAA,  m8PAB,  m8PBB;                 // 25
+extern int m9A,    m9B,    m9K,    m9MW,  m9PAA, m9PAB,  m9PBB,  m9S;                   // 33
+extern int m10A,   m10B,   m10K,   m10MW, m10O,  m10PAA, m10PAB, m10PBB, m10S,   m10W;  // 43
+extern int m11A,   m11B,   m11C,   m11E,  m11F,  m11MW,  m11O,   m11PAA, m11PAB;        // 52
+extern int m11PBB, m11S,   m11SB,  m11W;                                                // 56
+extern int m12A,   m12B,   m12D,   m12E,  m12K,  m12MW, m12O;                           // 63
+extern int m12PAA, m12PAB, m12PBB, m12S,  m12SB;                                        // 68
+extern int m13A,   m13B,   m13K,   m13MW;                                               // 72
+extern int m13PAA, m13PAB, m13PBB, m13S,  m13SB;                                        // 77
+extern int m14O,   mFCC,   mHCP,   mBCC_9;                                              // 81
 
 // cluster storage arrays (index i denotes number/identifier of cluster, j lists particles in cluster)
-int **hcsp3a, **hcsp3b, **hcsp3c;
-int **hcsp4a, **hcsp4b, **hcsp4c;
-int **hcsp5a, **hcsp5b, **hcsp5c;
-int **hc6A, **hc6Z, **hc7K, **hc7T_a, **hc7T_s;
-int **hc8A, **hc8B, **hc8K;
-int **hc9A, **hc9B, **hc9K;
-int **hc10A, **hc10B, **hc10K, **hc10W;
-int **hc11A, **hc11B, **hc11C, **hc11E, **hc11F, **hc11W;
-int **hc12A, **hc12B, **hc12D, **hc12E, **hc12K;
-int **hc13A, **hc13B, **hc13K;
-int **hcFCC, **hcHCP, **hcBCC_9;
+extern int **hcsp3a,  **hcsp3b,  **hcsp3c;
+extern int **hcsp4a,  **hcsp4b,  **hcsp4c;
+extern int **hcsp5a,  **hcsp5b,  **hcsp5c;                                                                          // 9
+extern int **hc6A,    **hc6MW,   **hc6Z;                                                                            // 12
+extern int **hc7K,    **hc7MW,   **hc7PAB,  **hc7T_a, **hc7T_s;                                                     // 17
+extern int **hc8A,    **hc8B,    **hc8K,    **hc8MW,  **hc8O,   **hc8PAA,  **hc8PAB,  **hc8PBB;                     // 25
+extern int **hc9A,    **hc9B,    **hc9K,    **hc9MW,  **hc9PAA, **hc9PAB,  **hc9PBB,  **hc9S;                       // 33
+extern int **hc10A,   **hc10B,   **hc10K,   **hc10MW, **hc10O,  **hc10PAA, **hc10PAB, **hc10PBB, **hc10S, **hc10W;  // 43
+extern int **hc11A,   **hc11B,   **hc11C,   **hc11E,  **hc11F,  **hc11MW,  **hc11O,   **hc11PAA, **hc11PAB;         // 52
+extern int **hc11PBB, **hc11S,   **hc11SB,  **hc11W;                                                                // 56
+extern int **hc12A,   **hc12B,   **hc12D,   **hc12E,  **hc12K,  **hc12MW,  **hc12O;                                 // 63
+extern int **hc12PAA, **hc12PAB, **hc12PBB, **hc12S,  **hc12SB;                                                     // 68                                    // 68
+extern int **hc13A,   **hc13B,   **hc13K,   **hc13MW;                                                               // 72
+extern int **hc13PAA, **hc13PAB, **hc13PBB, **hc13S,  **hc13SB;                                                     // 77                                    // 68
+extern int **hc14O,   **hcFCC,   **hcHCP,   **hcBCC_9;                                                              // 81
 
 // Raw lists of particle identity, output to RAW_clust files and reset each frame
-char *ssp3a, *ssp3b, *ssp3c;
-char *ssp4a, *ssp4b, *ssp4c;
-char *ssp5a, *ssp5b, *ssp5c;
-char *s6A, *s6Z, *s7K, *s7T_a, *s7T_s;
-char *s8A, *s8B, *s8K;
-char *s9A, *s9B, *s9K;
-char *s10A, *s10B, *s10K, *s10W;
-char *s11A, *s11B, *s11C, *s11E, *s11F, *s11W;
-char *s12A, *s12B, *s12D, *s12E, *s12K;
-char *s13A, *s13B, *s13K;
-char *sFCC, *sHCP, *sBCC_9;
+extern char *ssp3a,  *ssp3b,  *ssp3c;
+extern char *ssp4a,  *ssp4b,  *ssp4c;
+extern char *ssp5a,  *ssp5b,  *ssp5c;                                                             // 9
+extern char *s6A,    *s6MW,   *s6Z;                                                               // 12
+extern char *s7K,    *s7MW,   *s7PAB,  *s7T_a, *s7T_s;                                            // 17
+extern char *s8A,    *s8B,    *s8K,    *s8MW,  *s8O,   *s8PAA,  *s8PAB,  *s8PBB;                  // 25
+extern char *s9A,    *s9B,    *s9K,    *s9MW,  *s9PAA, *s9PAB,  *s9PBB,  *s9S;                    // 33
+extern char *s10A,   *s10B,   *s10K,   *s10MW, *s10O,  *s10PAA, *s10PAB, *s10PBB,  *s10S, *s10W;  // 43
+extern char *s11A,   *s11B,   *s11C,   *s11E,  *s11F,  *s11MW,  *s11O,   *s11PAA, *s11PAB;        // 52
+extern char *s11PBB, *s11S,   *s11SB,  *s11W;                                                     // 56
+extern char *s12A,   *s12B,   *s12D,   *s12E,  *s12K,  *s12MW,  *s12O;                            // 63
+extern char *s12PAA, *s12PAB, *s12PBB, *s12S,  *s12SB;                                            // 68
+extern char *s13A,   *s13B,   *s13K,   *s13MW;                                                    // 72
+extern char *s13PAA, *s13PAB, *s13PBB, *s13S,  *s13SB;                                            // 77
+extern char *s14O,   *sFCC,   *sHCP,   *sBCC_9;                                                   // 81
 
 // mem lists the clusters of that type each particle is in, index i is the particle index, j is the cluster id
 // nmem lists the number of clusters of that type each particle is in, index i is the number of particles
 // mmem lists the width of mem, the maximum number of clusters of the specified type associated with a single particle (the largest value in nmem)
-int **mem_sp3b, *nmem_sp3b, mmem_sp3b;
-int **mem_sp3c, *nmem_sp3c, mmem_sp3c;
-int **mem_sp4b, *nmem_sp4b, mmem_sp4b;
-int **mem_sp4c, *nmem_sp4c, mmem_sp4c;
-int **mem_sp5b, *nmem_sp5b, mmem_sp5b;
-int **mem_sp5c, *nmem_sp5c, mmem_sp5c;
+extern int **mem_sp3b, *nmem_sp3b, mmem_sp3b;
+extern int **mem_sp3c, *nmem_sp3c, mmem_sp3c;
+extern int **mem_sp4b, *nmem_sp4b, mmem_sp4b;
+extern int **mem_sp4c, *nmem_sp4c, mmem_sp4c;
+extern int **mem_sp5b, *nmem_sp5b, mmem_sp5b;
+extern int **mem_sp5c, *nmem_sp5c, mmem_sp5c;
 
 #endif

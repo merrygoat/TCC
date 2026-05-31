@@ -123,7 +123,7 @@ void parse_box_file(int total_frames) {
 }
 
 void get_NVT_box(FILE *read_box_file) {
-    char line[100];
+    char line[1000];
     char * word;
     int dimension;
     int valid_double = 0;
@@ -152,7 +152,7 @@ void get_NVT_box(FILE *read_box_file) {
 }
 
 void get_box_file_offsets(FILE *read_box_file, int total_frames) {
-    char line[100], error_message[100];
+    char line[1000], error_message[100];
     char * word;
     int dimension, frame, num_items;
     int valid_double = 0;

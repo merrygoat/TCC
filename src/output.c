@@ -178,7 +178,7 @@ void Write_Cluster_Compostions(int f, int cluster_type) {
 ////////// Pop per frame writing //////////
 
 void Write_Pop_Per_Frame(int f) {
-    char errMsg[1000], output[1000];
+    char errMsg[1000], output[950];
     int cluster_type, frame;
     FILE *file_pointer;
 
