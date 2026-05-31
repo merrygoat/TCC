@@ -165,7 +165,7 @@ char *s7K,    *s7MW,   *s7PAB,  *s7T_a, *s7T_s;                                 
 char *s8A,    *s8B,    *s8K,    *s8MW,  *s8O,   *s8PAA,  *s8PAB,  *s8PBB;                  // 25
 char *s9A,    *s9B,    *s9K,    *s9MW,  *s9PAA, *s9PAB,  *s9PBB,  *s9S;                    // 33
 char *s10A,   *s10B,   *s10K,   *s10MW, *s10O,  *s10PAA, *s10PAB, *s10PBB,  *s10S, *s10W;  // 43
-char *s11A,   *s11B,   *s11C,   *s11E,  *s11F,  *s11MW,  *s11O,   **s11PAA, **s11PAB;      // 52
+char *s11A,   *s11B,   *s11C,   *s11E,  *s11F,  *s11MW,  *s11O,   *s11PAA, *s11PAB;        // 52
 char *s11PBB, *s11S,   *s11SB,  *s11W;                                                     // 56
 char *s12A,   *s12B,   *s12D,   *s12E,  *s12K,  *s12MW,  *s12O;                            // 63
 char *s12PAA, *s12PAB, *s12PBB, *s12S,  *s12SB;                                            // 68
